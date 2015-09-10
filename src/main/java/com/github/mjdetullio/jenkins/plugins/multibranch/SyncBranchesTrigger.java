@@ -92,22 +92,13 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 
 		try {
 			StreamTaskListener listener = new StreamTaskListener(getLogFile());
-
 			long start = System.currentTimeMillis();
-
-			listener.getLogger().println(
-					"Started on " + DateFormat.getDateTimeInstance().format(
-							new Date()));
-
+			listener.getLogger().println("Started on " + DateFormat.getDateTimeInstance().format(new Date()));
 			job.syncBranches(listener);
-
-			listener.getLogger().println("Done. Took " + Util.getTimeSpanString(
-					System.currentTimeMillis() - start));
-
+			listener.getLogger().println("Done. Took " + Util.getTimeSpanString(System.currentTimeMillis() - start));
 			listener.close();
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE,
-					"Failed to record sync branches log for " + job, e);
+			LOGGER.log(Level.SEVERE, "Failed to record sync branches log for " + job, e);
 		}
 	}
 
@@ -138,7 +129,7 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 		 */
 		@SuppressWarnings(UNUSED)
 		public Item getOwner() {
-			return job;
+            return job;
 		}
 
 		/**
@@ -146,7 +137,7 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 		 */
 		@Override
 		public String getIconFileName() {
-			return "clipboard.png";
+            return "clipboard.png";
 		}
 
 		/**
@@ -154,7 +145,7 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 		 */
 		@Override
 		public String getDisplayName() {
-			return Messages.SyncBranchesLog_DisplayName();
+            return Messages.SyncBranchesLog_DisplayName();
 		}
 
 		/**
@@ -162,7 +153,7 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 		 */
 		@Override
 		public String getUrlName() {
-			return "syncBranchesLog";
+            return "syncBranchesLog";
 		}
 
 		/**
@@ -182,9 +173,12 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 		 */
 		@SuppressWarnings(UNUSED)
 		public void writeLogTo(XMLOutput out) throws IOException {
-			new AnnotatedLargeText<SyncBranchesAction>(getLogFile(),
-					Charset.defaultCharset(), true, this).writeHtmlTo(0,
-					out.asWriter());
+			new AnnotatedLargeText<SyncBranchesAction>(
+                    getLogFile(),
+                    Charset.defaultCharset(),
+                    true,
+                    this
+            ).writeHtmlTo(0, out.asWriter());
 		}
 	}
 
@@ -201,7 +195,7 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 		 */
 		@Override
 		public boolean isApplicable(Item item) {
-			return false;
+            return false;
 		}
 
 		/**
@@ -209,7 +203,7 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 		 */
 		@Override
 		public String getDisplayName() {
-			return SyncBranchesTrigger.class.getSimpleName();
+            return SyncBranchesTrigger.class.getSimpleName();
 		}
 	}
 
@@ -219,7 +213,7 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 		private final Calendar cal = new GregorianCalendar();
 
 		public long getRecurrencePeriod() {
-			return MIN;
+            return MIN;
 		}
 
 		public void doRun() {
@@ -229,8 +223,7 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 				try {
 					checkTriggers(cal);
 				} catch (Throwable e) {
-					LOGGER.log(Level.WARNING, "Cron thread throw an exception",
-							e);
+					LOGGER.log(Level.WARNING, "Cron thread throw an exception", e);
 					// bug in the code. Don't let the thread die.
 					e.printStackTrace();
 				}
@@ -242,8 +235,7 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 
 	public static void checkTriggers(Calendar cal) {
 		// Process all SyncBranchesTriggers
-		for (AbstractMultiBranchProject<?, ?> p : Jenkins.getInstance()
-				.getAllItems(AbstractMultiBranchProject.class)) {
+		for (AbstractMultiBranchProject<?, ?> p : Jenkins.getInstance().getAllItems(AbstractMultiBranchProject.class)) {
 			SyncBranchesTrigger t = p.getSyncBranchesTrigger();
 
 			LOGGER.fine("cron checking " + p.getName());
@@ -256,8 +248,7 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 				} catch (Throwable e) {
 					// t.run() is a plugin, and some of them throw RuntimeException and other things.
 					// don't let that cancel the polling activity. report and move on.
-					LOGGER.log(Level.WARNING, t.getClass().getName() +
-							".run() failed for " + p.getName(), e);
+					LOGGER.log(Level.WARNING, t.getClass().getName() + ".run() failed for " + p.getName(), e);
 				}
 			}
 		}
@@ -269,6 +260,6 @@ public class SyncBranchesTrigger extends Trigger<AbstractMultiBranchProject> {
 	@Initializer(before = InitMilestone.PLUGINS_STARTED)
 	@SuppressWarnings(UNUSED)
 	public static void registerXStream() {
-		Items.XSTREAM.alias("sync-branches-trigger", SyncBranchesTrigger.class);
+        Items.XSTREAM.alias("sync-branches-trigger", SyncBranchesTrigger.class);
 	}
 }

@@ -119,12 +119,13 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 /**
  * @author Matthew DeTullio
  */
-public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B> & TopLevelItem, B extends AbstractBuild<P, B>>
+public abstract class AbstractMultiBranchProject<
+        P extends AbstractProject<P, B> & TopLevelItem,
+        B extends AbstractBuild<P, B>>
 		extends AbstractItem
 		implements TopLevelItem, ItemGroup<P>, ViewGroup, SCMSourceOwner {
 
-	private static final String CLASSNAME = AbstractMultiBranchProject.class
-			.getName();
+	private static final String CLASSNAME = AbstractMultiBranchProject.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(CLASSNAME);
 
 	private static final String UNUSED = "unused";
@@ -171,8 +172,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onLoad(ItemGroup<? extends Item> parent, String name)
-			throws IOException {
+	public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
 		super.onLoad(parent, name);
 		runTriggerMigration();
 		runBranchProjectMigration();
@@ -180,21 +180,15 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	}
 
 	private synchronized void runTriggerMigration() {
-		if (triggers != null
-				&& triggers.size() > 0
-				&& triggers.get(0) != null
-				&& triggers.get(0) instanceof SyncBranchesTrigger
-				&& triggers.get(0).getSpec() != null) {
+		if (triggers != null && triggers.size() > 0 && triggers.get(0) != null &&
+			triggers.get(0) instanceof SyncBranchesTrigger && triggers.get(0).getSpec() != null) {
 			try {
-				syncBranchesTrigger = new SyncBranchesTrigger(
-						triggers.get(0).getSpec());
+				syncBranchesTrigger = new SyncBranchesTrigger(triggers.get(0).getSpec());
 				save();
 			} catch (ANTLRException e) {
-				LOGGER.log(Level.WARNING, "Unable to migrate trigger for " +
-						name, e);
+				LOGGER.log(Level.WARNING, "Unable to migrate trigger for " + name, e);
 			} catch (IOException e) {
-				LOGGER.log(Level.WARNING, "Unable to migrate trigger for " +
-						name, e);
+				LOGGER.log(Level.WARNING, "Unable to migrate trigger for " + name, e);
 			}
 		}
 	}
@@ -215,8 +209,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 		for (File subProjectDir : subProjects) {
 			File configFile = new File(subProjectDir, "config.xml");
 
-			if (!subProjectDir.isDirectory() || !configFile.exists()
-					|| !configFile.isFile()) {
+			if (!subProjectDir.isDirectory() || !configFile.exists() || !configFile.isFile()) {
 				continue;
 			}
 
@@ -244,13 +237,10 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 				if (isDisabled()) {
 					if (!subProjectDir.equals(getTemplateDir()) && xml.matches(
 							"(?ms).+(\r?\n)  <disabled>true</disabled>(\r?\n).+")) {
-						disabledSubProjects.add(
-								rawDecode(subProjectDir.getName()));
+						disabledSubProjects.add(rawDecode(subProjectDir.getName()));
 					}
 
-					xml = xml.replaceFirst(
-							"(?m)^  <disabled>false</disabled>$",
-							"  <disabled>true</disabled>");
+					xml = xml.replaceFirst("(?m)^  <disabled>false</disabled>$", "  <disabled>true</disabled>");
 				}
 
 				FileUtils.writeStringToFile(configFile, xml);
@@ -258,8 +248,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 				LOGGER.log(Level.WARNING, "Unable to migrate " + configFile, e);
 			}
 
-			String branchFullName =
-					getFullName() + '/' + subProjectDir.getName();
+			String branchFullName = getFullName() + '/' + subProjectDir.getName();
 
 			// Replacement mirrors jenkins.model.Jenkins#expandVariablesForDirectory
 			File[] builds = new File(Util.replaceMacro(
@@ -279,8 +268,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 			for (File buildDir : builds) {
 				File buildFile = new File(buildDir, "build.xml");
 
-				if (!buildDir.isDirectory() || !buildFile.exists()
-						|| !buildFile.isFile()) {
+				if (!buildDir.isDirectory() || !buildFile.exists() || !buildFile.isFile()) {
 					continue;
 				}
 
@@ -299,8 +287,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 
 					FileUtils.writeStringToFile(buildFile, xml);
 				} catch (IOException e) {
-					LOGGER.log(Level.WARNING, "Unable to migrate " + buildFile,
-							e);
+					LOGGER.log(Level.WARNING, "Unable to migrate " + buildFile, e);
 				}
 			}
 		}
@@ -314,8 +301,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	protected synchronized void init() {
 		if (subProjects == null) {
-			subProjects = Collections
-					.synchronizedMap(new LinkedHashMap<String, P>());
+			subProjects = Collections.synchronizedMap(new LinkedHashMap<String, P>());
 		}
 
 		if (disabledSubProjects == null) {
@@ -332,8 +318,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 			try {
 				listView.save();
 			} catch (IOException e) {
-				LOGGER.log(Level.WARNING,
-						"Failed to save initial multi-branch project view", e);
+				LOGGER.log(Level.WARNING, "Failed to save initial multi-branch project view", e);
 			}
 		}
 		if (primaryView == null) {
@@ -371,8 +356,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 			}
 			templateProject.disable();
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING,
-					"Failed to load template project " + getTemplateDir(), e);
+			LOGGER.log(Level.WARNING, "Failed to load template project " + getTemplateDir(), e);
 		}
 
 		if (getBranchesDir().isDirectory()) {
@@ -397,8 +381,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 						project.disable();
 					}
 				} catch (IOException e) {
-					LOGGER.log(Level.WARNING,
-							"Failed to load branch project " + branch, e);
+					LOGGER.log(Level.WARNING, "Failed to load branch project " + branch, e);
 				}
 			}
 		}
@@ -406,11 +389,9 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 		try {
 			restartSyncBranchesTrigger(null);
 		} catch (ANTLRException e) {
-			throw new IllegalArgumentException(
-					"Failed to instantiate SyncBranchesTrigger", e);
+			throw new IllegalArgumentException("Failed to instantiate SyncBranchesTrigger", e);
 		} catch (IOException e) {
-			throw new IllegalArgumentException(
-					"Failed to instantiate SyncBranchesTrigger", e);
+			throw new IllegalArgumentException("Failed to instantiate SyncBranchesTrigger", e);
 		}
 	}
 
@@ -422,8 +403,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 * @param branchName - branch name
 	 * @return new sub-project of type {@link P}
 	 */
-	protected abstract P createNewSubProject(AbstractMultiBranchProject parent,
-			String branchName);
+	protected abstract P createNewSubProject(AbstractMultiBranchProject parent, String branchName);
 
 	/**
 	 * Stapler URL binding for ${rootUrl}/job/${project}/branch/${branchProject}
@@ -468,8 +448,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	public File getBranchesDir() {
 		File dir = new File(getRootDir(), "branches");
 		if (!dir.isDirectory() && !dir.mkdirs()) {
-			LOGGER.log(Level.WARNING,
-					"Could not create branches directory {0}", dir);
+			LOGGER.log(Level.WARNING, "Could not create branches directory {0}", dir);
 		}
 		return dir;
 	}
@@ -481,7 +460,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 * @return File - "template" directory inside the project directory.
 	 */
 	public File getTemplateDir() {
-		return new File(getRootDir(), TEMPLATE);
+        return new File(getRootDir(), TEMPLATE);
 	}
 
 	//region ItemGroup implementation
@@ -491,7 +470,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@Override
 	public Collection<P> getItems() {
-		return getSubProjects();
+        return getSubProjects();
 	}
 
 	/**
@@ -499,7 +478,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@Override
 	public String getUrlChildPrefix() {
-		return "branch";
+        return "branch";
 	}
 
 	/**
@@ -507,7 +486,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@Override
 	public P getItem(String name) {
-		return subProjects.get(name);
+        return subProjects.get(name);
 	}
 
 	/**
@@ -529,8 +508,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@Override
 	public void onRenamed(P item, String oldName, String newName) {
-		throw new UnsupportedOperationException(
-				"Renaming sub-projects is not supported.  They should only be added or deleted.");
+		throw new UnsupportedOperationException("Renaming sub-projects is not supported.  They should only be added or deleted.");
 	}
 
 	/**
@@ -600,7 +578,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@Override
 	public ViewsTabBar getViewsTabBar() {
-		return viewsTabBar;
+        return viewsTabBar;
 	}
 
 	/**
@@ -608,7 +586,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@Override
 	public ItemGroup<? extends TopLevelItem> getItemGroup() {
-		return this;
+        return this;
 	}
 
 	/**
@@ -616,7 +594,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@Override
 	public List<Action> getViewActions() {
-		return Collections.emptyList();
+        return Collections.emptyList();
 	}
 
 	//endregion ViewGroup implementation
@@ -663,9 +641,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	public SCMSourceCriteria getSCMSourceCriteria(@NonNull SCMSource source) {
 		return new SCMSourceCriteria() {
 			@Override
-			public boolean isHead(@NonNull Probe probe,
-					@NonNull TaskListener listener)
-					throws IOException {
+			public boolean isHead(@NonNull Probe probe, @NonNull TaskListener listener) throws IOException {
 				return true;
 			}
 		};
@@ -716,9 +692,8 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 * @throws Descriptor.FormException - if problems
 	 */
 	@SuppressWarnings(UNUSED)
-	public synchronized void doCreateView(StaplerRequest req,
-			StaplerResponse rsp) throws IOException, ServletException,
-			ParseException, Descriptor.FormException {
+	public synchronized void doCreateView(StaplerRequest req, StaplerResponse rsp)
+			throws IOException, ServletException, ParseException, Descriptor.FormException {
 		checkPermission(CONFIGURE);
 		viewGroupMixIn.addView(View.create(req, rsp, this));
 	}
@@ -739,8 +714,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 		if (view == null || getView(view) == null) {
 			return FormValidation.ok();
 		} else {
-			return FormValidation.error(
-					jenkins.model.Messages.Hudson_ViewAlreadyExists(view));
+			return FormValidation.error(jenkins.model.Messages.Hudson_ViewAlreadyExists(view));
 		}
 	}
 
@@ -763,8 +737,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@Override
 	@RequirePOST
-	public void doDoDelete(StaplerRequest req, StaplerResponse rsp)
-			throws IOException, InterruptedException {
+	public void doDoDelete(StaplerRequest req, StaplerResponse rsp) throws IOException, InterruptedException {
 		delete();
 		if (req == null || rsp == null) {
 			return;
@@ -805,8 +778,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@RequirePOST
 	@SuppressWarnings(UNUSED)
-	public void doSyncBranches(StaplerRequest req, StaplerResponse rsp)
-			throws IOException, InterruptedException {
+	public void doSyncBranches(StaplerRequest req, StaplerResponse rsp) throws IOException, InterruptedException {
 		if (!allowAnonymousSync) {
 			checkPermission(CONFIGURE);
 		}
@@ -818,57 +790,48 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@SuppressWarnings(UNUSED)
 	public void doConfigSubmit(StaplerRequest req, StaplerResponse rsp)
-			throws ServletException, Descriptor.FormException, IOException {
+            throws ServletException, Descriptor.FormException, IOException {
 		checkPermission(CONFIGURE);
-
 		description = req.getParameter("description");
-
 		makeDisabled(req.getParameter("disable") != null);
-
 		allowAnonymousSync = req.getSubmittedForm().has("allowAnonymousSync");
 
 		try {
 			JSONObject json = req.getSubmittedForm();
-
 			setDisplayName(json.optString("displayNameOrNull"));
-
 			String syncBranchesCron = json.getString("syncBranchesCron");
+
 			try {
 				restartSyncBranchesTrigger(syncBranchesCron);
 			} catch (ANTLRException e) {
-				throw new IllegalArgumentException(
-						"Failed to instantiate SyncBranchesTrigger", e);
+				throw new IllegalArgumentException("Failed to instantiate SyncBranchesTrigger", e);
 			}
 
 			primaryView = json.getString("primaryView");
-
 			JSONObject scmSourceJson = json.optJSONObject("scmSource");
+
 			if (scmSourceJson == null) {
 				scmSource = null;
 			} else {
 				int value = Integer.parseInt(scmSourceJson.getString("value"));
-				SCMSourceDescriptor descriptor = getSCMSourceDescriptors(
-						true).get(
-						value);
+				SCMSourceDescriptor descriptor = getSCMSourceDescriptors(true).get(value);
 				scmSource = descriptor.newInstance(req, scmSourceJson);
 				scmSource.setOwner(this);
 			}
 
-			templateProject.doConfigSubmit(
-					new TemplateStaplerRequestWrapper(req), rsp);
-
+			templateProject.doConfigSubmit(new TemplateStaplerRequestWrapper(req), rsp);
 			save();
-			ItemListener.fireOnUpdated(this);
 
+			ItemListener.fireOnUpdated(this);
 			String newName = req.getParameter("name");
-			final ProjectNamingStrategy namingStrategy =
-					Jenkins.getInstance().getProjectNamingStrategy();
+
+			final ProjectNamingStrategy namingStrategy = Jenkins.getInstance().getProjectNamingStrategy();
+
 			if (newName != null && !newName.equals(name)) {
 				// check this error early to avoid HTTP response splitting.
 				Jenkins.checkGoodName(newName);
 				namingStrategy.checkName(newName);
-				rsp.sendRedirect("rename?newName=" + URLEncoder.encode(newName,
-						"UTF-8"));
+				rsp.sendRedirect("rename?newName=" + URLEncoder.encode(newName, "UTF-8"));
 			} else {
 				if (namingStrategy.isForceExistingJobs()) {
 					namingStrategy.checkName(name);
@@ -880,8 +843,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 		} catch (JSONException e) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
-			pw.println(
-					"Failed to parse form data. Please report this problem as a bug");
+			pw.println("Failed to parse form data. Please report this problem as a bug");
 			pw.println("JSON=" + req.getSubmittedForm());
 			pw.println();
 			e.printStackTrace(pw);
@@ -963,8 +925,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 			listener.getLogger().println("SCM not selected.");
 
 			for (P project : getSubProjects()) {
-				listener.getLogger().println(
-						"Deleting project for branch " + project.getName());
+				listener.getLogger().println("Deleting project for branch " + project.getName());
 				try {
 					project.delete();
 				} catch (Throwable e) {
@@ -988,11 +949,9 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 
 			if (!subProjects.containsKey(branchName)) {
 				// Add new projects
-				listener.getLogger().println(
-						"Creating project for branch " + branchName);
+				listener.getLogger().println("Creating project for branch " + branchName);
 				try {
-					subProjects.put(branchName,
-							createNewSubProject(this, branchName));
+					subProjects.put(branchName, createNewSubProject(this, branchName));
 					newBranches.add(branchName);
 				} catch (Throwable e) {
 					e.printStackTrace(listener.fatalError(e.getMessage()));
@@ -1005,8 +964,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 		Set<String> projectBranchesToRemove = getCurrentBranchNames();
 		projectBranchesToRemove.removeAll(branches.keySet());
 		for (String branchName : projectBranchesToRemove) {
-			listener.getLogger().println(
-					"Deleting project for branch " + branchName);
+			listener.getLogger().println("Deleting project for branch " + branchName);
 
 			try {
 				P project = subProjects.remove(branchName);
@@ -1020,9 +978,8 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 		// Sync config for existing branch projects
 		XmlFile configFile = templateProject.getConfigFile();
 		for (P project : getSubProjects()) {
-			listener.getLogger().println(
-					"Syncing configuration to project for branch "
-							+ project.getName());
+			listener.getLogger().println("Syncing configuration to project for branch " + project.getName());
+
 			try {
 				boolean wasDisabled = project.isDisabled();
 
@@ -1035,16 +992,14 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 				 * the wrong location during save, load, and elsewhere if SCM
 				 * remains null (or NullSCM).
 				 */
-				project.setScm(
-						scmSource.build(branches.get(project.getName())));
+				project.setScm(scmSource.build(branches.get(project.getName())));
 
 				if (!wasDisabled) {
 					project.enable();
 				}
 
 				// Work-around for JENKINS-21017
-				project.setCustomWorkspace(
-						templateProject.getCustomWorkspace());
+				project.setCustomWorkspace(templateProject.getCustomWorkspace());
 
 				//noinspection unchecked
 				project.onLoad(project.getParent(), project.getName());
@@ -1062,12 +1017,10 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 		// Trigger build for new branches
 		// TODO make this optional
 		for (String branch : newBranches) {
-			listener.getLogger().println(
-					"Scheduling build for branch " + branch);
+			listener.getLogger().println("Scheduling build for branch " + branch);
 			try {
 				P project = subProjects.get(branch);
-				project.scheduleBuild(
-						new SCMTrigger.SCMTriggerCause("New branch detected."));
+				project.scheduleBuild(new SCMTrigger.SCMTriggerCause("New branch detected."));
 			} catch (Throwable e) {
 				e.printStackTrace(listener.fatalError(e.getMessage()));
 			}
@@ -1198,8 +1151,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 		for (P item : getItems()) {
 			B b = item.getFirstBuild();
 
-			if (b != null && (retVal == null
-					|| b.getTimestamp().before(retVal.getTimestamp()))) {
+			if (b != null && (retVal == null || b.getTimestamp().before(retVal.getTimestamp()))) {
 				retVal = b;
 			}
 		}
@@ -1297,8 +1249,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	}
 
 	private B takeLast(B b1, B b2) {
-		if (b2 != null && (b1 == null
-				|| b2.getTimestamp().after(b1.getTimestamp()))) {
+		if (b2 != null && (b1 == null || b2.getTimestamp().after(b1.getTimestamp()))) {
 			return b2;
 		}
 		return b1;
@@ -1306,11 +1257,11 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 
 	@Override
 	public Collection<? extends Job> getAllJobs() {
-		return getItems();
+        return getItems();
 	}
 
 	public boolean isDisabled() {
-		return disabled;
+        return disabled;
 	}
 
 	public void makeDisabled(boolean b) throws IOException {
@@ -1321,7 +1272,6 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 
 		save();
 		ItemListener.fireOnUpdated(this);
-
 
 		Iterable<P> subProjectsView = getSubProjects();
 
@@ -1372,7 +1322,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@SuppressWarnings(UNUSED)
 	public boolean supportsMakeDisabled() {
-		return true;
+        return true;
 	}
 
 	@SuppressWarnings(UNUSED)
@@ -1412,20 +1362,14 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@Override
 	public ACL getACL() {
-		AuthorizationStrategy strategy =
-				Jenkins.getInstance().getAuthorizationStrategy();
+		AuthorizationStrategy strategy = Jenkins.getInstance().getAuthorizationStrategy();
+		AuthorizationMatrixProperty amp = templateProject.getProperty(AuthorizationMatrixProperty.class);
 
-		AuthorizationMatrixProperty amp = templateProject.getProperty(
-				AuthorizationMatrixProperty.class);
-
-		if (strategy instanceof ProjectMatrixAuthorizationStrategy
-				&& amp != null) {
+		if (strategy instanceof ProjectMatrixAuthorizationStrategy && amp != null) {
 			SidACL projectAcl = amp.getACL();
 
 			if (!amp.isBlocksInheritance()) {
-				projectAcl = projectAcl.newInheritingACL(
-						((ProjectMatrixAuthorizationStrategy) strategy).getACL(
-								getParent()));
+				projectAcl = projectAcl.newInheritingACL(((ProjectMatrixAuthorizationStrategy) strategy).getACL(getParent()));
 			}
 
 			return projectAcl;
@@ -1436,7 +1380,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 
 	@SuppressWarnings(UNUSED)
 	public boolean isConfigurable() {
-		return true;
+        return true;
 	}
 
 	/**
@@ -1445,8 +1389,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@Override
 	public String getPronoun() {
-		return AlternativeUiTextProvider.get(PRONOUN, this,
-				hudson.model.Messages.AbstractProject_Pronoun());
+		return AlternativeUiTextProvider.get(PRONOUN, this, hudson.model.Messages.AbstractProject_Pronoun());
 	}
 
 	/**
@@ -1457,14 +1400,13 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@Extension
 	@SuppressWarnings(UNUSED)
-	public static class SyncBranchesTransientActionFactory extends
-			TransientActionFactory<AbstractMultiBranchProject> {
+	public static class SyncBranchesTransientActionFactory extends TransientActionFactory<AbstractMultiBranchProject> {
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public Class<AbstractMultiBranchProject> type() {
-			return AbstractMultiBranchProject.class;
+            return AbstractMultiBranchProject.class;
 		}
 
 		/**
@@ -1472,8 +1414,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 		 */
 		@Nonnull
 		@Override
-		public Collection<? extends Action> createFor(
-				@Nonnull AbstractMultiBranchProject target) {
+		public Collection<? extends Action> createFor(@Nonnull AbstractMultiBranchProject target) {
 			if (target.getSyncBranchesTrigger() != null) {
 				return target.getSyncBranchesTrigger().getProjectActions();
 			}
@@ -1488,18 +1429,16 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	@SuppressWarnings(UNUSED)
 	public static List<ViewDescriptor> getViewDescriptors() {
 		return Collections.singletonList(
-				(ViewDescriptor) Jenkins.getInstance().getDescriptorByType(
-						BranchListView.DescriptorImpl.class));
+                (ViewDescriptor) Jenkins.getInstance().getDescriptorByType(BranchListView.DescriptorImpl.class));
 	}
 
 	/**
 	 * Returns a list of SCMSourceDescriptors that we want to use for this
 	 * project type.  Used by configure-entries.jelly.
 	 */
-	public static List<SCMSourceDescriptor> getSCMSourceDescriptors(
-			boolean onlyUserInstantiable) {
-		List<SCMSourceDescriptor> descriptors = SCMSourceDescriptor.forOwner(
-				AbstractMultiBranchProject.class, onlyUserInstantiable);
+	public static List<SCMSourceDescriptor> getSCMSourceDescriptors(boolean onlyUserInstantiable) {
+		List<SCMSourceDescriptor> descriptors =
+                SCMSourceDescriptor.forOwner(AbstractMultiBranchProject.class, onlyUserInstantiable);
 
 		/*
 		 * No point in having SingleSCMSource as an option, so axe it.
@@ -1528,9 +1467,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 		try {
 			bytes = s.getBytes("UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException(
-					"JLS specification mandates UTF-8 as a supported encoding",
-					e);
+			throw new IllegalStateException("JLS specification mandates UTF-8 as a supported encoding", e);
 		}
 
 		final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -1554,9 +1491,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 		try {
 			return new String(buffer.toByteArray(), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException(
-					"JLS specification mandates UTF-8 as a supported encoding",
-					e);
+			throw new IllegalStateException("JLS specification mandates UTF-8 as a supported encoding", e);
 		}
 	}
 
@@ -1576,8 +1511,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	public static void enforceProjectStateOnUpdated(Item item) {
 		if (item.getParent() instanceof AbstractMultiBranchProject) {
-			AbstractMultiBranchProject parent =
-					(AbstractMultiBranchProject) item.getParent();
+			AbstractMultiBranchProject parent = (AbstractMultiBranchProject) item.getParent();
 			AbstractProject template = parent.getTemplate();
 
 			// Direct memory reference comparison
@@ -1600,8 +1534,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 				 */
 				if (!parent.subProjects.containsKey(TEMPLATE)) {
 					try {
-						FileUtils.deleteDirectory(
-								new File(parent.getBranchesDir(), TEMPLATE));
+						FileUtils.deleteDirectory(new File(parent.getBranchesDir(), TEMPLATE));
 					} catch (IOException e) {
 						LOGGER.warning("Unable to delete rogue template dir.");
 					}
@@ -1629,7 +1562,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	public static final class BranchProjectItemListener extends ItemListener {
 		@Override
 		public void onUpdated(Item item) {
-			enforceProjectStateOnUpdated(item);
+            enforceProjectStateOnUpdated(item);
 		}
 	}
 
@@ -1639,8 +1572,7 @@ public abstract class AbstractMultiBranchProject<P extends AbstractProject<P, B>
 	 */
 	@SuppressWarnings(UNUSED)
 	@Extension
-	public static final class BranchProjectSaveListener extends
-			SaveableListener {
+	public static final class BranchProjectSaveListener extends SaveableListener {
 		@Override
 		public void onChange(Saveable o, XmlFile file) {
 			if (o instanceof Item) {

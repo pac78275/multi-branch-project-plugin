@@ -39,8 +39,7 @@ import jenkins.model.Jenkins;
  * @author Matthew DeTullio
  */
 @SuppressWarnings("unused")
-public class FreeStyleMultiBranchProject extends AbstractMultiBranchProject
-		<FreeStyleProject, FreeStyleBuild> {
+public class FreeStyleMultiBranchProject extends AbstractMultiBranchProject<FreeStyleProject, FreeStyleBuild> {
 
 	private static final String UNUSED = "unused";
 
@@ -56,8 +55,7 @@ public class FreeStyleMultiBranchProject extends AbstractMultiBranchProject
 	}
 
 	@Override
-	protected FreeStyleProject createNewSubProject(
-			AbstractMultiBranchProject parent, String branchName) {
+	protected FreeStyleProject createNewSubProject(AbstractMultiBranchProject parent, String branchName) {
 		return new FreeStyleProject(parent, branchName);
 	}
 
@@ -66,8 +64,7 @@ public class FreeStyleMultiBranchProject extends AbstractMultiBranchProject
 	 */
 	@Override
 	public TopLevelItemDescriptor getDescriptor() {
-		return (DescriptorImpl) Jenkins.getInstance().getDescriptorOrDie(
-				FreeStyleMultiBranchProject.class);
+		return (DescriptorImpl) Jenkins.getInstance().getDescriptorOrDie(FreeStyleMultiBranchProject.class);
 	}
 
 	/**
@@ -88,7 +85,7 @@ public class FreeStyleMultiBranchProject extends AbstractMultiBranchProject
 		 */
 		@Override
 		public String getDisplayName() {
-			return Messages.FreeStyleMultiBranchProject_DisplayName();
+            return Messages.FreeStyleMultiBranchProject_DisplayName();
 		}
 
 		/**
@@ -106,7 +103,6 @@ public class FreeStyleMultiBranchProject extends AbstractMultiBranchProject
 	@Initializer(before = InitMilestone.PLUGINS_STARTED)
 	@SuppressWarnings(UNUSED)
 	public static void registerXStream() {
-		Items.XSTREAM.alias("freestyle-multi-branch-project",
-				FreeStyleMultiBranchProject.class);
+		Items.XSTREAM.alias("freestyle-multi-branch-project", FreeStyleMultiBranchProject.class);
 	}
 }

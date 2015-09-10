@@ -34,14 +34,12 @@ import net.sf.json.JSONObject;
  * @author Matthew DeTullio
  */
 public class TemplateStaplerRequestWrapper extends RequestImpl {
-	public TemplateStaplerRequestWrapper(StaplerRequest request)
-			throws ServletException {
+	public TemplateStaplerRequestWrapper(StaplerRequest request) throws ServletException {
 		/*
 		 * Ugly casts to RequestImpl... but should be ok since it will throw
 		 * errors, which we want anyway if it's not that type.
 		 */
-		super(request.getStapler(), request, ((RequestImpl) request).ancestors,
-				((RequestImpl) request).tokens);
+		super(request.getStapler(), request, ((RequestImpl) request).ancestors, ((RequestImpl) request).tokens);
 
 		// Remove some fields that we don't want to send to the template
 		JSONObject json = getSubmittedForm();

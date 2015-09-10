@@ -44,9 +44,7 @@ import java.io.IOException;
  * @author Matthew DeTullio
  */
 @SuppressWarnings("unused")
-public class MavenMultiBranchProject extends
-		AbstractMultiBranchProject<MavenModuleSet, MavenModuleSetBuild> {
-
+public class MavenMultiBranchProject extends AbstractMultiBranchProject<MavenModuleSet, MavenModuleSetBuild> {
 	private static final String UNUSED = "unused";
 
 	/**
@@ -61,20 +59,18 @@ public class MavenMultiBranchProject extends
 	}
 
 	@Override
-	protected MavenModuleSet createNewSubProject(
-			AbstractMultiBranchProject parent, String branchName) {
+	protected MavenModuleSet createNewSubProject(AbstractMultiBranchProject parent, String branchName) {
 		return new MavenModuleSet(parent, branchName);
 	}
 
 	@SuppressWarnings(UNUSED)
 	protected Class<MavenModuleSetBuild> getBuildClass() {
-		return MavenModuleSetBuild.class;
+        return MavenModuleSetBuild.class;
 	}
 
 	@Override
 	public TopLevelItemDescriptor getDescriptor() {
-		return (DescriptorImpl) Jenkins.getInstance().getDescriptorOrDie(
-				MavenMultiBranchProject.class);
+		return (DescriptorImpl) Jenkins.getInstance().getDescriptorOrDie(MavenMultiBranchProject.class);
 	}
 
 	/**
@@ -85,9 +81,7 @@ public class MavenMultiBranchProject extends
 	 * @return validation of file
 	 */
 	@SuppressWarnings(UNUSED)
-	public FormValidation doCheckFileInWorkspace(@QueryParameter String value)
-			throws IOException,
-			ServletException {
+	public FormValidation doCheckFileInWorkspace(@QueryParameter String value) throws IOException, ServletException {
 		// Probably not great
 		return FormValidation.ok();
 	}
@@ -96,14 +90,13 @@ public class MavenMultiBranchProject extends
 	 * Our project's descriptor.
 	 */
 	@Extension
-	public static class DescriptorImpl extends
-			AbstractProject.AbstractProjectDescriptor {
+	public static class DescriptorImpl extends AbstractProject.AbstractProjectDescriptor {
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public String getDisplayName() {
-			return Messages.MavenMultiBranchProject_DisplayName();
+            return Messages.MavenMultiBranchProject_DisplayName();
 		}
 
 		/**
@@ -121,7 +114,6 @@ public class MavenMultiBranchProject extends
 	@Initializer(before = InitMilestone.PLUGINS_STARTED)
 	@SuppressWarnings(UNUSED)
 	public static void registerXStream() {
-		Items.XSTREAM.alias("maven-multi-branch-project",
-				MavenMultiBranchProject.class);
+		Items.XSTREAM.alias("maven-multi-branch-project", MavenMultiBranchProject.class);
 	}
 }
