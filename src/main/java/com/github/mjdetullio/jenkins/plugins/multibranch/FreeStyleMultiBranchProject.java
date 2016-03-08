@@ -23,86 +23,84 @@
  */
 package com.github.mjdetullio.jenkins.plugins.multibranch;
 
+import com.cloudbees.hudson.plugins.folder.AbstractFolderDescriptor;
 import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
-import hudson.model.AbstractProject;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.ItemGroup;
 import hudson.model.Items;
 import hudson.model.TopLevelItem;
-import hudson.model.TopLevelItemDescriptor;
 import jenkins.model.Jenkins;
 
 /**
  * @author Matthew DeTullio
  */
 @SuppressWarnings("unused")
-public class FreeStyleMultiBranchProject extends AbstractMultiBranchProject<FreeStyleProject, FreeStyleBuild> {
+public final class FreeStyleMultiBranchProject extends AbstractMultiBranchProject<FreeStyleProject, FreeStyleBuild> {
 
-	private static final String UNUSED = "unused";
+    private static final String UNUSED = "unused";
 
-	/**
-	 * Constructor that specifies the {@link ItemGroup} for this project and the
-	 * project name.
-	 *
-	 * @param parent - the project's parent {@link ItemGroup}
-	 * @param name   - the project's name
-	 */
-	public FreeStyleMultiBranchProject(ItemGroup parent, String name) {
-		super(parent, name);
-	}
+    /**
+     * Constructor that specifies the {@link ItemGroup} for this project and the
+     * project name.
+     *
+     * @param parent the project's parent {@link ItemGroup}
+     * @param name   the project's name
+     */
+    public FreeStyleMultiBranchProject(ItemGroup parent, String name) {
+        super(parent, name);
+    }
 
-	@Override
-	protected FreeStyleProject createNewSubProject(AbstractMultiBranchProject parent, String branchName) {
-		return new FreeStyleProject(parent, branchName);
-	}
+    @Override
+    protected FreeStyleProject createNewSubProject(AbstractMultiBranchProject parent, String branchName) {
+        return new FreeStyleProject(parent, branchName);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public TopLevelItemDescriptor getDescriptor() {
-		return (DescriptorImpl) Jenkins.getInstance().getDescriptorOrDie(FreeStyleMultiBranchProject.class);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AbstractFolderDescriptor getDescriptor() {
+        return (DescriptorImpl) Jenkins.getActiveInstance().getDescriptorOrDie(FreeStyleMultiBranchProject.class);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected Class<FreeStyleBuild> getBuildClass() {
-		return FreeStyleBuild.class;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    protected Class<FreeStyleBuild> getBuildClass() {
+        return FreeStyleBuild.class;
+    }
 
-	/**
-	 * Our project's descriptor.
-	 */
-	@Extension
-	public static class DescriptorImpl extends
-			AbstractProject.AbstractProjectDescriptor {
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String getDisplayName() {
+    /**
+     * Our project's descriptor.
+     */
+    @Extension
+    public static class DescriptorImpl extends AbstractFolderDescriptor {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getDisplayName() {
             return Messages.FreeStyleMultiBranchProject_DisplayName();
-		}
+        }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public TopLevelItem newInstance(ItemGroup parent, String name) {
-			return new FreeStyleMultiBranchProject(parent, name);
-		}
-	}
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public TopLevelItem newInstance(ItemGroup parent, String name) {
+            return new FreeStyleMultiBranchProject(parent, name);
+        }
+    }
 
-	/**
-	 * Gives this class an alias for configuration XML.
-	 */
-	@Initializer(before = InitMilestone.PLUGINS_STARTED)
-	@SuppressWarnings(UNUSED)
-	public static void registerXStream() {
-		Items.XSTREAM.alias("freestyle-multi-branch-project", FreeStyleMultiBranchProject.class);
-	}
+    /**
+     * Gives this class an alias for configuration XML.
+     */
+    @Initializer(before = InitMilestone.PLUGINS_STARTED)
+    @SuppressWarnings(UNUSED)
+    public static void registerXStream() {
+        Items.XSTREAM.alias("freestyle-multi-branch-project", FreeStyleMultiBranchProject.class);
+    }
 }
